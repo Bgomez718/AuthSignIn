@@ -1,6 +1,8 @@
 package com.JobAssistant.authService.services;
 
 
+import javax.management.RuntimeErrorException;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +27,11 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request){
+
+        if(userExist(request.getEmail())){
+          throw new RuntimeErrorException(null, "User already exist with email " + request.getEmail());
+        }
+
         var user = User.builder()
         .firstname(request.getFirstName())
         .lastname(request.getLastName())
@@ -51,5 +58,14 @@ public class AuthenticationService {
         
         .build();
 
+
+    }
+
+    public boolean userExist(String email){
+        if(repository.findByEmail(email) != null){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
