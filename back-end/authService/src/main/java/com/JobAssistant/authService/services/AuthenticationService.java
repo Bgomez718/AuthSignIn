@@ -1,14 +1,12 @@
 package com.JobAssistant.authService.services;
 
 
-import javax.management.RuntimeErrorException;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.JobAssistant.authService.config.JwtService;
 import com.JobAssistant.authService.models.AuthenticationRequest;
 import com.JobAssistant.authService.models.AuthenticationResponse;
 import com.JobAssistant.authService.models.RegisterRequest;
@@ -28,8 +26,8 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request){
 
-        if(userExist(request.getEmail())){
-          throw new RuntimeErrorException(null, "User already exist with email " + request.getEmail());
+        if(userExist(request.getEmail()) == true){
+          return AuthenticationResponse.builder().token(null).message("User Already Exist").build();
         }
 
         var user = User.builder()
@@ -42,7 +40,7 @@ public class AuthenticationService {
         repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
-        .token(jwtToken)
+        .token(jwtToken).message("User sucessfully registered")
         
         .build();
     }
@@ -62,7 +60,7 @@ public class AuthenticationService {
     }
 
     public boolean userExist(String email){
-        if(repository.findByEmail(email) != null){
+        if(repository.findByEmail(email).isPresent()){
             return true;
         } else {
             return false;

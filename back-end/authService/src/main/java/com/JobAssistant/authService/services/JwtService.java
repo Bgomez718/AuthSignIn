@@ -1,4 +1,4 @@
-package com.JobAssistant.authService.config;
+package com.JobAssistant.authService.services;
 
 import java.security.Key;
 import java.util.Date;
